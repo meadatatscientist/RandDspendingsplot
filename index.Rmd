@@ -1,0 +1,11 @@
+---
+title: "R & D spendings in the European Union"
+author: "jpapmeier"
+date: "18 März 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
