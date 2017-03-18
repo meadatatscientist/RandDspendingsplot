@@ -5,7 +5,39 @@ date: "18 März 2017"
 output: ioslides_presentation
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyr)
+library(plotly)
 ```
+
+```{r, loaddata}
+spendings <- read.csv("gba_nabsfin07_1_Data.csv", stringsAsFactors = FALSE)
+spendings$Value <- as.numeric(sub(",","",spendings$Value))
+spendings <- spread(spendings, UNIT, Value)
+names(spendings) <- c("TIME","GEO","NABS07","Flags","EuroPerCapita","Euro","PPS","PPS2005","NatCur")
+
+spendings <- filter(spendings, NABS07 == "Total civil R&D appropriations" | NABS07 == "Total R&D appropriations") %>% 
+  filter(!is.na(NatCur)) %>% 
+  group_by(TIME,GEO) %>% 
+  mutate(ratio = ((1-lag(NatCur)/NatCur)*100)) %>% 
+  filter(NABS07 == "Total R&D appropriations")
+```
+
+## Plot
+
+```{r plot}
+p <- plot_ly(spendings) %>%
+  add_markers(x=spendings$TIME,y=spendings$PPS2005,color=spendings$GEO) %>%
+  layout(title="Research and Development Spendings",
+         xaxis = list(title="Year"),
+         yaxis = list(title="Million Purchasing Power Standard 2005 prices")) 
+  p
+```
+
+## Sources
+
+Data from http://ec.europa.eu/eurostat/tgm/table.do?tab=table&plugin=1&language=en&pcode=tsc00008 export as CSV all in one file to recreate slides
 
